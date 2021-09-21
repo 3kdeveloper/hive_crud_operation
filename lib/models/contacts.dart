@@ -1,6 +1,6 @@
 class Contacts {
   final String name;
-  final int phoneNo;
+  final int age;
 
-  Contacts(this.name, this.phoneNo);
+  Contacts(this.name, this.age);
 }

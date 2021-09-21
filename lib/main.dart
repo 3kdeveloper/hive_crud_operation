@@ -12,10 +12,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Hive CRUD',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
-      home: const HomeScreen(),
+      home: HomeScreen(),
     );
   }
 }
