@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:learn_hive_crud/models/contacts.dart';
+import 'package:learn_hive_crud/widgets/build_contacts_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -31,14 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         height: Get.height,
         width: Get.width,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: buildListView(),
+                child: buildContactsList(),
               ),
               SizedBox(
                 height: Get.height * 0.1,
@@ -49,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration:
                           const InputDecoration(hintText: 'Enter your name'),
                       onSaved: (value) => _name = value,
+                      validator: (value) {
+                        if (!GetUtils.isLengthGreaterThan(value, 2)) {
+                          return 'Name must be greater then 3 char';
+                        }
+                      },
                     )),
                     const SizedBox(width: 20),
                     Expanded(
@@ -57,47 +63,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration:
                           const InputDecoration(hintText: 'Enter your age'),
                       onSaved: (value) => _age = value,
+                      validator: (value) {
+                        if (!GetUtils.isLengthBetween(value, 1, 150)) {
+                          return 'Name must be between 150';
+                        }
+                      },
                     )),
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  _formKey.currentState!.save();
-                  final newContact = Contacts(_name!, int.parse(_age!));
-                  addContacts(newContact);
-                  print('Contact added');
-                },
-                child: const Text('Add Contact'),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      final newContact = Contacts(_name!, int.parse(_age!));
+                      addContacts(newContact);
+                    }
+                  },
+                  child: const Text('Add Contact'),
+                ),
               ),
               SizedBox(height: Get.height * 0.02),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  ListView buildListView() {
-    final contactsBox = Hive.box('contacts');
-    return ListView.builder(
-      itemCount: contactsBox.length,
-      itemBuilder: (context, index) {
-        final contact = contactsBox.getAt(index) as Contacts;
-        return ListTile(
-          title: Text(
-            contact.name,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          subtitle: Text(
-            contact.age.toString(),
-            style: const TextStyle(fontSize: 20),
-          ),
-        );
-      },
     );
   }
 }
